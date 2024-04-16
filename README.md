@@ -1,2 +1,2 @@
-# R_ish-house
-This repository holds my work in R program and it's findings. 
+# Project-house
+This repository holds my data analysis work on interesting datasets in R, python and SQL.
