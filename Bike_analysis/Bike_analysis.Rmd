@@ -1,0 +1,238 @@
+---
+Title: "Analysing_the_bike_lending_dataset"
+Author: "Ajithkumar_M"
+Date: "October_2023"
+---
+
+The dataset which I used in this project is officially owned by a particular learning platform and i used it to build my project as a trail. 
+
+# Objective of the project:
+
+The main focus of this project is to increase the profitability of the bike sharing company by answering the following questions,
+  * Which type of rider uses the bike most and how much?
+  * What is the peak usage day of a week?
+  * Which docking stations are used frequently and not used much by the customers?
+  * is there any popular start and end stations to find traffic route?
+
+Let's begin the game!
+
+Begin by installing and loading the required packages. When the package 'Tidyverse' gets installed and loaded, other packages like forcats, ggplot2, lubridate, purr, stringr, tibble and tidyr are also installed along with the same name.
+
+```{r}
+
+install.packages("tidyverse")
+library(tidyverse)
+
+```
+
+Importing the dataset in rstudio cloud and the following 3 lines of code automatically executed by the studio when we try to import the dataset.
+
+```{r}
+library(readr)  
+sample_trip <- read_csv("sample_trip.csv")
+View(sample_trip)
+```
+
+# sliced the dataset and formed a new table that has 75000 rows for my convinence:
+
+```{r}
+sample_trip <- slice(trips_2020_q1, 1:75000)
+head(sample_trip)
+write.csv(sample_trip, "sample_trip.csv", row.names = FALSE)
+
+```
+
+# Data wrangling
+remove null values, duplicates and saved in the same dataframe.
+
+```{r}
+sample_trip <- unique(na.omit(sample_trip))
+
+```
+
+trimmed the extra spaces in the dataset.
+
+```{r}
+sample_trip[] <- lapply(sample_trip,trimws)
+
+```
+
+check the datatype of each column.
+
+```{r}
+sapply(sample_trip,class)
+head(sample_trip)
+
+```
+
+calculate the difference of two POSIXct data and mutate it into new column.
+```{r}
+sample_trip <- sample_trip %>% mutate(time_diff <- ended_at - started_at)
+
+```
+
+change the title of the column using names().
+
+```{r}
+names(sample_trip)[14] <- "time_diff"
+
+```
+
+separate the POSIXct datatype column  into two columns using 'separate' function.
+
+```{r}
+sample_trip <- separate(sample_trip, started_at, into = c("s_date","s_time"), sep = " ")
+sample_trip <- separate(sample_trip, ended_at, into = c("e_date","e_time"), sep = " ")
+
+```
+
+After the two columns formed, their datatype was 'char' . They need to be changed respectively.
+
+```{r}
+sample_trip$s_date <- as.Date(sample_trip$s_date, format = "%Y-%m-%d")
+sample_trip$e_date <- as.Date(sample_trip$e_date, format = "%Y-%m-%d")
+view(sample_trip)
+
+```
+
+# Data manipulation and visualization:
+Arranged the s_date column to find the starting date and ending date.
+
+```{r}
+data_wrang_sample_trip <- sample_trip %>% arrange(s_date)
+
+```
+
+saving the sample_trip dataset after the cleansing process for accessibility purpose in the name of data_wrang_sample_trip.
+
+```{r}
+write.csv(data_wrang_sample_trip, "data_wrang_sample_trip.csv", row.names = FALSE)
+
+```
+
+Grouping the dataset based on date to find out the total_no_of_riders & total_time per day.
+
+```{r}
+grouped <- data_wrang_sample_trip %>% 
+  group_by(s_date) %>%
+  summarise(time_mins = (sum(time_diff))/60, count = n())
+print(grouped)
+
+```
+Let me visualize the grouped table to get conclusion
+
+```{r}
+
+ggplot(data = grouped, aes(x = s_date,y = count)) + geom_point(color = "blue") + geom_line(color = "blue")
+
+```
+
+![Total_count vs Days](https://197f5a2f5ffb4fe8a0aa2e48e9d8b74d.app.posit.cloud/file_show?path=%2Fcloud%2Fproject%2Fmember%26count.png)
+FINDINGS:
+
+  We can see that there are 4 drops(<2000) in the graph. 1st drop on Jan 4th and 5th, 2nd drop on Jan 11th and 12th, 3rd drop on 18th and 19th and the 4th drop on 25th and 26th of january 2020. These dates that I mentioned are saturday and sunday's of the week where there was less riding takes place. Remaining 5 days of the week outperformed the weekends. So the customers, who mostly uses the bike might be the working professionals.
+
+Forming a table with only the members (without new table or calc)
+
+```{r}
+only_member <- data_wrang_sample_trip %>% filter(member_casual == "member") 
+glimpse(only_member)
+
+```
+
+getting graph for members using ggplot()
+
+```{r}
+member_data_m <- only_member %>%  
+  arrange(s_date) %>%
+  group_by(s_date) %>%
+  summarise(time_mins = (sum(time_diff))/60, count = n())
+
+ggplot(data = member_data_m) + geom_line(mapping = aes(x= s_date, y= count))
+
+```
+
+![Members Vs Count](https://197f5a2f5ffb4fe8a0aa2e48e9d8b74d.app.posit.cloud/file_show?path=%2Fcloud%2Fproject%2Fcount%26day.png)
+
+we can get graph for casual riders as well.
+
+```{r}
+only_casual <- data_wrang_sample_trip %>% filter(member_casual == "casual") #table for casuals
+glimpse(only_casual)
+member_data_c <- only_casual %>%
+  arrange(s_date) %>%
+  group_by(s_date) %>%
+  summarise(time_mins = (sum(time_diff))/60, count_c = n())
+
+ggplot(data = member_data_c) + geom_line(mapping = aes(x= s_date, y= count_c))
+
+```
+
+![Casuals Vs Count](https://197f5a2f5ffb4fe8a0aa2e48e9d8b74d.app.posit.cloud/file_show?path=%2Fcloud%2Fproject%2Fcasual%26count.png)
+
+Let's see two line charts(Members and casuals) together in a graph to make further decisions.
+
+Firstly, form a new table that has x common and y both values. Then,merge both the tables using the common s_date column.
+
+```{r}
+new_mem_cas <- merge(member_data_m, member_data_c, by = "s_date")   # new table formed
+view(new_mem_cas)
+
+```
+
+graphical representation of two lines.
+```{r}
+
+ggplot(data = new_mem_cas, aes(x = s_date)) + geom_line(aes(y = count), color = "white") +
+  geom_line(aes(y = count_c), color = "white") + theme_dark()
+
+```
+
+![Members Vs Casuals](https://197f5a2f5ffb4fe8a0aa2e48e9d8b74d.app.posit.cloud/file_show?path=%2Fcloud%2Fproject%2Fnew_mem_cas.png)
+FINDINGS:
+
+As we can see, most of the customers were membership holders. A very few are casual riders (~1/10).
+
+New calculations: station_id that are most used(top 7) found them and made a map using leaflet.
+
+```{r}
+free <- data_wrang_sample_trip %>%
+  count(start_station_id) # count() is used to count the no.of.occurrences of each value in a data frame column.
+free1 <- data_wrang_sample_trip %>%
+  count(end_station_id)
+names(free)[2] <- "no_of_start_station_riders"
+names(free1)[2] <- "no_of_end_station_riders"
+names(free)[1] <- "station_id"
+names(free1)[1] <- "station_id"
+freed <- merge(free, free1, by = "station_id")
+view(freed)
+
+```
+
+'freed' table contains no_of_start and end_station_riders.
+picking top 7 by arranging in descending order. Getting their lat&long manually.
+
+```{r}
+map <- data.frame(station_id = c(192,77,91,133,195,174,43), latitude = c(41.8793,41.8822,41.8834,41.8892,41.8847,41.8821,41.8840), 
+                  longitude = c(-87.6399,-87.6411,-87.6412,-87.6385,-87.6195,-87.6398,-87.6247))
+```
+
+
+Using Leaflet(), marking these lat&longitudes.
+
+```{r}
+library(leaflet)
+
+ak <- leaflet(data = map) %>%
+  addTiles() %>%
+  addMarkers(~longitude, ~latitude, popup = ~station_id, label = ~station_id)
+ak
+
+```
+
+![Top_stations](https://197f5a2f5ffb4fe8a0aa2e48e9d8b74d.app.posit.cloud/file_show?path=%2Fcloud%2Fproject%2Fmap.jpeg)
+
+FINDINGS:
+
+  Among 594 stations, these 7 stations are the mostly used docking stations and mostly used route. Nearly 25% of the entire customer using these stations. It's necessary to take much care on these stations because of the profitability.
+  There are nearly 160 stations that're least used(<25). I would recommend to increase the focus on these stations to make more profit.
