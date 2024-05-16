@@ -65,3 +65,25 @@ Languages used:
 4) We can see that there are 4 drops(<2000) in the graph. 1st drop on Jan 4th and 5th, 2nd drop on Jan 11th and 12th, 3rd drop on 18th and 19th and the 4th drop on 25th and 26th of january 2020. These dates that I mentioned are saturday and sunday's of the week where there was less riding takes place. Remaining 5 days of the week outperformed the weekends. So the customers, who mostly uses the bike might be the working professionals
 
 <img width="350" height="250" src="https://github.com/Ajithkumar-M16/Project_house/blob/main/Bike_analysis/Images/map.jpeg"/>   <img width="350" height="250" src="https://github.com/Ajithkumar-M16/Project_house/blob/main/Bike_analysis/Images/new_mem_cas.png"/>   <img width="350" height="250" src="https://github.com/Ajithkumar-M16/Project_house/blob/main/Bike_analysis/Images/day_mem.png"/>   <img width="350" height="250" src="https://github.com/Ajithkumar-M16/Project_house/blob/main/Bike_analysis/Images/member%26count.png"/>
+
+
+## PROJECT_4: Reaction Analysis in Python. 
+This project is built as a result of Accenture North America Data Analytics and visualization job simulation by the Forage[https://www.theforage.com/simulations/accenture-nam/data-analytics-mmlb](https://www.theforage.com/simulations/accenture-nam/data-analytics-mmlb). I completed all the tasks assigned and earned the certificate.
+
+Tool used to analyze data:  <img width="78" height="78" src="https://img.icons8.com/fluency/48/jupyter.png" alt="jupyter"/>    Language used: <img width="48" height="48" src="https://img.icons8.com/color/48/python--v1.png" alt="python--v1"/>
+
+- In this project, I analyzed the data which scattered in three different datasets(Reaction,reaction_type and content).
+- I conducted data wrangling and manipulation using *Pandas* and *NumPy* libraries and formed a single dataset at the end of the process(final_data.csv).
+- I performed several analysis including Time-Series Analysis using *ARIMA* to forecast the future scope and met the objectives of the project.
+- *Matplotlib* and *Seaborn* have been used for data visualization.
+
+
+### FINDINGS:
+
+1) The top and bottom 5 categories that the users most used.
+2) I found that 'scared' is the mostly used reaction in the animal category. Then followed by peeking, hate, cherish and super love.
+3) The month of may 2021 remains top and the june month of both 2020 and 2021 remains the bottom position. So,it is necessary to take more care in this month and to find reason for this happening. This reason seems to be inadequate data. The June month has only half of the days data,remaining got missed.
+4) The 'positive' sentiment is huge(few thousands) whereas the 'neutral' and 'negative' sentiments is very minimal.
+5)  I forecasted the reaction score of animals category for the next 30 days. The orange color line depicts the forecast of the animals' reaction score which stands at 206.
+
+<img width="350" height="250" src="https://github.com/Ajithkumar-M16/Project_house/blob/main/Reaction_analysis/Images/Average_score_5.png"/>   <img width="350" height="250" src="https://github.com/Ajithkumar-M16/Project_house/blob/main/Reaction_analysis/Images/Forecast_manual.png"/>  <img width="350" height="250" src="https://github.com/Ajithkumar-M16/Project_house/blob/main/Reaction_analysis/Images/forecast.png"/>   <img width="350" height="250" src="https://github.com/Ajithkumar-M16/Project_house/blob/main/Reaction_analysis/Images/Top_categories.png"/>
